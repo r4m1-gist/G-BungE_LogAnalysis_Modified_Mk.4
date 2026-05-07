@@ -1,29 +1,34 @@
-# G-BungE_LogAnalysis_Modified
-Based on `GBungE_logger_python` by quserunknownp.
-Modified and extended for GIST Baja/Formula EV team logger.
-The original workflow selected logs and plots by uncommenting code; this fork adds CLI and interactive menus for quicker repeated analysis.
+# G-BungE Log Analysis
 
-GIST Student Baja/Formula team logger project. Based on luftaquila/monolith v1.  
+Python-based log parsing and analysis workflow for the GIST Baja / Formula EV team.
 
-Modified and extended for GIST Baja/Formula EV team logger.
+This repository is based on `GBungE_logger_python` and keeps the original MATLAB reference files, but the day-to-day workflow is centered on Python. The main difference from the older code path is that you do not need to uncomment functions by hand every time you want a graph. You can select logs and analyses from a CLI or an interactive menu.
 
-## Project Layout
+## What This Repo Does
+
+- Parses binary vehicle log files into a shared `VehicleLog` container
+- Runs GPS, torque, motor-control, power, thermal, and cooling analyses
+- Supports both interactive selection and repeatable CLI commands
+- Loads split-session logs in order so one driving session can be analyzed as a single run
+- Keeps the original MATLAB scripts as reference material under `MatLab/`
+
+## Repository Layout
 
 ```text
 .
-├── main.py                # CLI entry point for selecting logs and plots
-├── logFetcher.py          # Binary log parser and VehicleLog data container
+├── main.py                # CLI entry point and interactive menu
+├── logFetcher.py          # Binary log parser and VehicleLog container
 ├── logPostProcessor.py    # Plotting and analysis functions
 ├── Logs/
 │   ├── 2nd Test Week/
 │   └── Main Competition/
-└── MatLab/                # Original MATLAB reference scripts and output/reference files
-    └── Results/           # MATLAB output/reference files
+└── MatLab/
+    └── Results/           # MATLAB reference outputs
 ```
 
-## Initial Setup
+## Install
 
-macOS:
+macOS / Linux:
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -35,17 +40,170 @@ Windows:
 py -m pip install -r requirements.txt
 ```
 
-If `py` is not available on Windows, use:
+If `py` is not available:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
 
+## Log Organization
+
+By default, project-relative logs live under:
+
+```text
+Logs/<group name>/<timestamp>.log
+```
+
+Examples:
+
+```text
+Logs/2nd Test Week/2025-08-17 05-31-36.log
+Logs/Main Competition/2025-08-30 08-32-10.log
+```
+
+You can also pass absolute log paths directly.
+
+## Quick Start
+
+Interactive menu:
+
+```bash
+python3 main.py
+```
+
+or, if executable permission is set:
+
+```bash
+./main.py
+```
+
+Windows:
+
+```powershell
+py main.py
+```
+
+The interactive flow is:
+
+1. Choose a log group
+2. Choose one or more log files
+3. Choose one or more plots/actions
+
+Selections accept:
+
+- single values such as `1`
+- comma-separated values such as `1,4,7`
+- ranges such as `3-6`
+- `all`
+
+## Common CLI Usage
+
+Show help:
+
+```bash
+python3 main.py --help
+```
+
+List available log groups and files:
+
+```bash
+python3 main.py --list-logs
+```
+
+List available plot/action names:
+
+```bash
+python3 main.py --list-plots
+```
+
+Run one plot on one log:
+
+```bash
+python3 main.py \
+  --group "2nd Test Week" \
+  --log "2025-08-17 05-31-36.log" \
+  --plot gps-only
+```
+
+Run multiple analyses on the same session:
+
+```bash
+python3 main.py \
+  --group "2nd Test Week" \
+  --log "2025-08-17 05-31-36.log" \
+  --plot torque-performance \
+  --plot vector-control \
+  --plot power-and-temp
+```
+
+Run split-session logs in order:
+
+```bash
+python3 main.py \
+  --group "2nd Test Week" \
+  --log "2025-08-17 05-31-36.log" "2025-08-17 05-44-54.log" \
+  --plot torque-performance \
+  --plot vector-control
+```
+
+Fail immediately when a selected log is missing:
+
+```bash
+python3 main.py \
+  --group "Main Competition" \
+  --log "2025-08-30 08-32-10.log" \
+  --plot temperature-profile \
+  --strict
+```
+
+## Analysis Categories
+
+The interactive menu groups actions by purpose so the long list stays readable.
+
+### Core / GPS
+
+- `gps-only`
+- `gps-velocity-and-slip`
+- `gps-gforce-map`
+- `split-laps`
+- `laps-slideshow`
+
+### Torque / Motor Control
+
+- `torque-performance`
+- `vector-control`
+- `field-weakening`
+- `advanced-id-iq-analysis`
+- `id-iq-vs-rpm`
+- `auto-field-weakening-trend`
+- `torque-vs-iq`
+- `motor-control-constraints`
+- `torque-vs-temperature`
+- `tn-curve-envelope`
+
+### Power / Efficiency
+
+- `power-and-temp`
+- `moving-rms`
+- `power-vs-rpm`
+- `power-flow`
+- `current-efficiency`
+
+### Thermal / Cooling
+
+- `temperature-profile`
+- `power-vs-temp-slope`
+- `cooling-trend-regression`
+- `thermal-lag`
+- `cooling-trend-high-temp`
+
+### Vehicle Dynamics
+
+- `vehicle-dynamics-mv-avg`
+
 ## CAN Data Mapping
 
-The parser is based on 2025 vehicle Mk.4 logs and currently focuses on MK4 CAN data.
-
-When adding new logs, place the `.log` files under `Logs/<group name>/`, then pass the group and log file names to `main.py`.
+The current parser is focused on 2025 Mk.4 vehicle logs.
 
 | Source | Key | Data |
 | --- | --- | --- |
@@ -59,92 +217,29 @@ When adding new logs, place the `.log` files under `Logs/<group name>/`, then pa
 | 6 | 1 | GPS velocity and course |
 | 6 | 2 | GPS time |
 
-## CLI Usage
+## Practical Notes
 
-Run the interactive menu:
+- Logs are resolved from `Logs/<group>/` unless you pass an absolute path.
+- When a single driving session was split into multiple `.log` files, pass them to `--log` in chronological order.
+- Temperature and cooling analyses in the Python path include defensive `NaN` / infinite-value filtering before interpolation or regression. This avoids the common issue where preallocated empty samples pollute thermal trend fitting.
+- Cooling and thermal regressions are skipped when there are not enough valid samples.
+- `NaN` usually means the signal was unavailable, not parsed, or not received at that timestamp. Treat it as missing coverage, not a physical value.
 
-```bash
-./main.py
-```
+## Tuning Analysis Parameters
 
-The script shows numbered menus. Type the number you want and press Enter:
+Some plots in `logPostProcessor.py` intentionally include configurable assumptions such as:
 
-```text
-Log Groups
-   1. 2nd Test Week
-   2. Main Competition
-Select one group number [default: 1]: 1
+- current limits
+- RPM bin widths
+- minimum samples per bin
+- field-weakening thresholds
+- thermal window lengths
 
-Logs in 2nd Test Week
-  15. 2025-08-17 05-31-36.log  # Iq/Id 파악 가능, Laps: 1/2/1
-  16. 2025-08-17 05-44-54.log  # Iq/Id 파악 가능, Laps: 1/0/0
-Select log numbers (example: 1,3-5 or all): 15
+Treat those values as analysis configuration, not fixed vehicle truth.
 
-Plots / Actions
-  Tip: 분석 목적별로 묶었습니다. 번호 입력 방식은 동일합니다: 1,4 또는 all
+If one graph needs different thresholds for a specific run, prefer adjusting the call site in `main.py` rather than rewriting the plotting function itself. That keeps the visualizer reusable across different sessions.
 
-  [Core / GPS]
-   1. gps-only  # GPS 주행 궤적
-   2. gps-velocity-and-slip  # GPS 속도와 slip ratio
-
-  [Torque / Motor Control]
-   6. torque-performance  # 토크 명령/실측/RPM
-   7. vector-control  # Id/Iq와 DC 링크 전압
-Select plot/action numbers (example: 1,4 or all): 1
-```
-
-You can enter one number like `1`, multiple values like `1,3,5`, ranges like `3-7`, or `all`.
-
-You can also force the menu explicitly:
-
-```bash
-./main.py --interactive
-```
-
-List available log groups and files:
-
-```bash
-./main.py --list-logs
-```
-
-List available plot/action names:
-
-```bash
-./main.py --list-plots
-```
-
-Run one plot against one log:
-
-```bash
-./main.py --group "2nd Test Week" --log "2025-08-17 05-31-36.log" --plot gps-only
-```
-
-Run multiple split-session logs in order:
-
-```bash
-./main.py \
-  --group "2nd Test Week" \
-  --log "2025-08-17 05-31-36.log" "2025-08-17 05-44-54.log" \
-  --plot torque-performance \
-  --plot vector-control
-```
-
-Absolute log paths are also supported. In non-interactive usage, pass at least one log with `--log`.
-
-## Notes
-
-- Logs are expected under `Logs/<group name>/`.
-- New log file paths are selected with `--group` and `--log`.
-- If a driving session is split into multiple log files, pass them to `--log` in order.
-- Unlike the original log analysis flow, the Python temperature and cooling analysis functions include defensive `NaN`/infinite-value filtering before interpolation or regression, preventing preallocated empty samples from affecting trend fits.
-- Cooling and thermal regression plots are especially sensitive to sparse data, so fitting is skipped when there are not enough valid samples.
-- `NaN` values usually mean that the signal was not available, not parsed, or not received at that timestamp. They are mainly useful for checking data coverage, CAN dropouts, or parser mapping issues, not as physical values.
-
-Plotting functions in the visualizer module often include assumptions and default constraints (e.g., current limits, bin widths, minimum samples per bin, field weakening thresholds). Treat those values as analysis configuration.
-
-When a graph needs different conditions, adjust the function call at the `main.py` level before running the analysis, rather than changing the class implementation in `logPostProcessor.py` each time. In other words, keep the plot functions reusable and pass run-specific parameters from the caller.
-
-For example:
+Example:
 
 ```python
 visualizer.plot_id_iq_vs_rpm(
@@ -167,8 +262,13 @@ visualizer.plot_torque_vs_iq(
 )
 ```
 
-Tune these values depending on the log: sparse data usually needs wider bins or lower minimum sample counts; controller reference lines such as current limits should match the vehicle setup used for that run.
+For sparse logs, wider bins or lower minimum sample counts usually work better.
 
-The interactive action menu is grouped by analysis purpose to keep the function list readable after clearing the terminal. Older overlapping analysis variants are kept in the visualizer code but hidden from the menu so the default list stays focused. Existing input styles such as `1,4`, `3-7`, and `all` still work.
+## Dependencies
 
-In summary, treat plotting parameters as part of the analysis configuration (in main), not as fixed logic inside the visualizer class.
+`requirements.txt` currently installs:
+
+- `matplotlib`
+- `numpy`
+- `scikit-learn`
+- `scipy`
