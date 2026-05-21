@@ -453,7 +453,7 @@ def select_interactively(registry: dict[str, str]) -> tuple[str, list[str], list
 
     default_group_index = groups.index(DEFAULT_LOG_GROUP) if DEFAULT_LOG_GROUP in groups else 0
     selected_group_index = prompt_for_indexes(
-        "Log Groups",
+        "Log Groups (About. G-BungE Mk.4)",
         groups,
         "Select one group number",
         default_indexes=[default_group_index],
