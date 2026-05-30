@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>G-BungE Log Analysis Web</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f6f8;
+        --panel: #ffffff;
+        --ink: #13181d;
+        --muted: #66727d;
+        --line: #d9dee5;
+        --accent: #dc2f27;
+        --accent-soft: #fff0ee;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      header {
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+        padding: 28px 32px 20px;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 30px;
+        line-height: 1.15;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      header p {
+        margin: 8px 0 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      pre {
+        margin: 12px 0 0;
+        overflow-x: auto;
+        border-radius: 8px;
+        background: #11181d;
+        color: #edf3f7;
+        padding: 14px;
+        line-height: 1.5;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: #9f1d18;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .steps li {
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+
+      .steps li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      a {
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      @media (max-width: 760px) {
+        header {
+          padding: 24px 18px 18px;
+        }
+
+        main {
+          padding: 18px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="badge">Local Python runner</span>
+      <h1>G-BungE Log Analysis Web</h1>
+      <p>기존 Python CLI 분석기를 브라우저 폼으로 실행하는 로컬 웹 러너입니다.</p>
+    </header>
+
+    <main>
+      <div class="grid">
+        <section class="panel">
+          <h2>실행 방법</h2>
+          <p>
+            GitHub Pages에서는 Python 분석 코드를 실행할 수 없습니다. 실제 로그 분석은
+            로컬에서 아래 명령으로 서버를 켠 뒤 접속합니다.
+          </p>
+          <pre><code>python3 web/server.py</code></pre>
+          <p>서버가 켜지면 아래 주소를 엽니다.</p>
+          <pre><code>http://127.0.0.1:8765</code></pre>
+        </section>
+
+        <aside class="panel">
+          <h2>웹 러너에서 하는 일</h2>
+          <ul class="steps">
+            <li>로그 그룹과 `.log` 파일을 선택합니다.</li>
+            <li>GPS, torque, thermal, power 분석 플롯을 고릅니다.</li>
+            <li>Matplotlib 결과를 PNG로 저장하고 브라우저에 표시합니다.</li>
+          </ul>
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>

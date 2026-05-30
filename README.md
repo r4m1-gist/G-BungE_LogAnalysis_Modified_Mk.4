@@ -10,6 +10,10 @@ This repository contains a Python analysis tool for real Baja EV Mk.4 driving lo
 
 The project keeps the original MATLAB reference scripts under `MatLab/`, but the daily workflow is centered on `main.py`: a CLI and interactive menu that lets the user choose log groups, split-session files, and analysis actions without editing source code for every run.
 
+A web-based beta version is also included. It lets users select logs and
+analysis actions in a browser while running the same Python analysis code behind
+the scenes.
+
 The log parser currently focuses on 2025 Mk.4 vehicle data, including:
 
 - binary vehicle log records
@@ -86,6 +90,9 @@ Future documentation should add example plot images under `docs/images/` or a si
 ├── docs/
 │   ├── analysis_notes.md    # Purpose of each analysis category
 │   └── future_work.md       # Improvement roadmap
+├── web/
+│   ├── index.html           # Static GitHub Pages landing page
+│   └── server.py            # Local browser UI for running the Python CLI
 └── README_KOR.md            # Korean documentation
 ```
 
@@ -141,6 +148,31 @@ Selections accept:
 - comma-separated values such as `1,4,7`
 - ranges such as `3-6`
 - `all`
+
+## Web Runner
+
+The web runner is currently a beta interface for the existing CLI workflow.
+
+To run the Python analysis workflow from a browser form, start the local web
+server:
+
+```bash
+python3 web/server.py
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+The web runner reuses `main.py`, `logFetcher.py`, and `logPostProcessor.py`. It
+saves Matplotlib outputs as PNG files under `web_runs/` and displays them in the
+browser. Generated plot output and Matplotlib cache files are ignored by Git.
+
+`web/index.html` is a static landing page for GitHub Pages-style hosting. Static
+hosting cannot execute the Python analysis code, so real log analysis still
+requires the local Python server above.
 
 ## CLI Usage
 

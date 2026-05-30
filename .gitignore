@@ -10,4 +10,8 @@ __pycache__/
 # Personal analysis demo file
 main_analysis.py
 
+# Local web UI outputs
+.matplotlib-cache/
+web_runs/
+
 # If YOU'RE ON WINDOWS, ADD YOUR OWN IGNORE RULES (I'm too lazy to include them here)
